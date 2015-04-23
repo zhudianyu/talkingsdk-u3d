@@ -1,0 +1,68 @@
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: "file:///Users/roscus/sourcecode/mvn")
+        pom.groupId = 'com.talkingsdk.u3d'
+        pom.version = '0.5'
+        pom.artifactId = 'talkingsdk'
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath System.getenv()['ANDROID_GRADLE_VERSION']
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 16
+    compileSdkVersion 19
+    buildToolsVersion System.getenv()["BUILD_TOOL_VERSION"]
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDir 'src'
+            res.srcDir 'res'
+            assets.srcDir 'assets'
+            resources.srcDir 'src'
+        }
+        test {
+            java.srcDir 'tests/src'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://repos.code4.in/release/talkingsdk-maven/raw/master/"
+    }
+}
+
+dependencies {
+    if ( System.getenv()["TSENV"] != "production" ) {
+        println(" in development" )
+        compile project (":libs:unity")
+    } else {
+        println(" in production" )
+        compile("com.talkingsdk.u3d:unity:2.1.5")
+    }
+}
